@@ -116,8 +116,8 @@ export default function CreateListing() {
             if(formData.imageUrls.length < 1){
                 return setError('You must upload atleast 1 image');
             }
-            if(formData.regularPrice < formData.discountPrice){
-                return setError('Regular price must be less than discount price')
+            if(+formData.regularPrice < +formData.discountPrice){
+                return setError('Discount price must be less than regular price')
             }
             setLoading(true);
             setError(false);
@@ -185,20 +185,32 @@ export default function CreateListing() {
                         <p>Baths</p>
                     </div>
                     <div className='flex items-center gap-2'>
-                        <input onChange={handleChange} type='number' id='regularPrice' min='1000' max='50000000' required className='p-3 border border-gray-300 rounded-lg' value={formData.regularPrice}/>
+                        <input onChange={handleChange} type='number' id='regularPrice' min='1000' max='1000000000' required className='p-3 border border-gray-300 rounded-lg' value={formData.regularPrice}/>
                         <div className='flex flex-col items-center'>
                             <p>Regular price</p>
-                            <span className='text-xs'>(₹ / month)</span>
+                            {
+                                formData.type === 'rent' ? (
+                                    <span className='text-xs'>(₹ / month)</span>
+                                ) : (
+                                    <span className='text-xs'>(₹)</span>
+                                )
+                            }
                         </div>
                     </div>
                     {/* discounted price will only be shown if there is an offer */}
                     {
                        formData.offer &&  
                         <div className='flex items-center gap-2'>
-                            <input onChange={handleChange} type='number' id='discountPrice' min='0' max='48000000' required className='p-3 border border-gray-300 rounded-lg' value={formData.discountPrice}/>
+                            <input onChange={handleChange} type='number' id='discountPrice' min='0' max='999999999' required className='p-3 border border-gray-300 rounded-lg' value={formData.discountPrice}/>
                             <div className='flex flex-col items-center'>
                                 <p>Discounted price</p>
-                                <span className='text-xs'>(₹ / month)</span>
+                                {
+                                    formData.type === 'rent' ? (
+                                        <span className='text-xs'>(₹ / month)</span>
+                                    ) : (
+                                        <span className='text-xs'>(₹)</span>
+                                    )
+                                }
                             </div>
                         </div>
                     }

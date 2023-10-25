@@ -203,7 +203,13 @@ export default function UpdateListing() {
                         <input onChange={handleChange} type='number' id='regularPrice' min='1000' max='50000000' required className='p-3 border border-gray-300 rounded-lg' value={formData.regularPrice}/>
                         <div className='flex flex-col items-center'>
                             <p>Regular price</p>
-                            <span className='text-xs'>(₹ / month)</span>
+                            {
+                                formData.type === 'rent' ? (
+                                    <span className='text-xs'>(₹ / month)</span>
+                                ) : (
+                                    <span className='text-xs'>(₹)</span>
+                                )
+                            }
                         </div>
                     </div>
                     {/* discounted price will only be shown if there is an offer */}
@@ -213,7 +219,13 @@ export default function UpdateListing() {
                             <input onChange={handleChange} type='number' id='discountPrice' min='0' max='48000000' required className='p-3 border border-gray-300 rounded-lg' value={formData.discountPrice}/>
                             <div className='flex flex-col items-center'>
                                 <p>Discounted price</p>
-                                <span className='text-xs'>(₹ / month)</span>
+                                {
+                                    formData.type === 'rent' ? (
+                                        <span className='text-xs'>(₹ / month)</span>
+                                    ) : (
+                                        <span className='text-xs'>(₹)</span>
+                                    )
+                                }
                             </div>
                         </div>
                     }
