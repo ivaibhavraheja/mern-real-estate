@@ -6,6 +6,7 @@ export default function Search() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
+  const [showMore, setShowMore] = useState(false);
   const [sidebarData, setSidebarData] = useState({
     searchTerm: '',
     type: 'all',
@@ -16,7 +17,7 @@ export default function Search() {
     order: 'desc',
   });
   
-  console.log(listings);
+  // console.log(listings);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -42,10 +43,17 @@ export default function Search() {
 
     const fetchListings = async() => {
       setLoading(true);
+      setShowMore(false);
       const searchQuery = urlParams.toString();
       const res = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await res.json();
-      console.log(data);
+      if(data.length > 8){
+        setShowMore(true);
+      }
+      else{
+        setShowMore(false);
+      }
+      // console.log(data);
       setListings(data);
       setLoading(false);
     }
@@ -83,6 +91,21 @@ export default function Search() {
     urlParams.set('order', sidebarData.order);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
+  }
+
+  const onShowMoreClick = async() => {
+    const numberOfListings = listings.length;
+    const startIndex = numberOfListings;
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('startIndex', startIndex);
+    const searchQuery = urlParams.toString();
+    const res = await fetch(`/api/listing/get?${searchQuery}`);
+    const data = await res.json();
+    if(data.length < 9){
+      setShowMore(false);
+    }
+    //since data is also an array so we use spread operator for it also
+    setListings([...listings, ...data]);
   }
 
   return (
@@ -166,6 +189,14 @@ export default function Search() {
               <ListingItem key={listing._id} listing={listing}/>
             ))
           }
+          {showMore && (
+            <button
+              onClick={onShowMoreClick}
+              className='w-full text-green-700 hover:underline p-7 font-semibold text-center'
+            >
+              Show More
+            </button>
+          )}
         </div>
       </div>
     </div>
