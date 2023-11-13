@@ -14,10 +14,10 @@ export default function Footer() {
             <div className='flex flex-col gap-1'>
               <p className='font-semibold text-xl'>Connect With Us</p>
               <div className='flex gap-3'>
-                <a href="" className='hover:scale-110 transition-all delay-100 ease-in-out'><AiFillFacebook size={35}/></a>
-                <a href="" className='hover:scale-110 transition-all delay-100 ease-in-out'><AiFillInstagram size={35}/></a>
-                <a href="" className='hover:scale-110 transition-all delay-100 ease-in-out'><AiFillTwitterCircle size={35}/></a>
-                <a href="" className='hover:scale-110 transition-all delay-100 ease-in-out'><AiFillRedditCircle size={35}/></a>
+                <a href="https://www.facebook.com/" className='hover:scale-110 transition-all delay-100 ease-in-out' target='_blank' rel='noreferrer'><AiFillFacebook size={35}/></a>
+                <a href="https://www.instagram.com/" className='hover:scale-110 transition-all delay-100 ease-in-out' target='_blank' rel='noreferrer'><AiFillInstagram size={35}/></a>
+                <a href="https://twitter.com/" className='hover:scale-110 transition-all delay-100 ease-in-out' target='_blank' rel='noreferrer'><AiFillTwitterCircle size={35}/></a>
+                <a href="https://www.reddit.com/?rdt=64383" className='hover:scale-110 transition-all delay-100 ease-in-out' target='_blank' rel='noreferrer'><AiFillRedditCircle size={35}/></a>
               </div>
             </div>
           </div>

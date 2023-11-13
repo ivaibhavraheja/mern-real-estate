@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {Swiper, SwiperSlide} from 'swiper/react';
 import {Navigation} from 'swiper/modules'
 import SwiperCore from 'swiper';
 import 'swiper/css/bundle'
 import ListingItem from '../components/ListingItem';
 import Footer from '../components/Footer';
+import { useSelector } from 'react-redux';
 
 export default function Home() {
   const [offerListings, setOfferListings] = useState([]);
   const [saleListings, setSaleListings] = useState([]);
   const [rentListings, setRentListings] = useState([]);
+
+  const { currentUser } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+
   SwiperCore.use([Navigation]);
 
   console.log(offerListings);
@@ -57,6 +62,14 @@ export default function Home() {
     fetchOfferListings();
   }, [])
 
+  const handlePostProperty = () => {
+    if(currentUser === null){
+      navigate('/sign-in')
+    }
+    else{
+      navigate('/create-listing')
+    }
+  }
 
   return (
     <div>
@@ -108,6 +121,20 @@ export default function Home() {
             </div>
           )
         }
+
+        <div className='flex items-center justify-between bg-indigo-800 text-white rounded-lg px-8 py-4 max-w-5xl'>
+          <div>
+            <p className='text-2xl font-bold leading-8 tracking-wide'>Post your property for <span className='font-semibold italic text-3xl'>Free</span></p>
+            <p className='italic tracking-wide'>List it on xKinG Estate and get genuine leads</p>
+          </div>
+          <div className='flex gap-3 items-center'>
+            <button className='bg-sky-100 p-4 rounded-full text-black font-semibold' onClick={handlePostProperty}>
+              Post Property
+              <span className='text-xs bg-white p-1 rounded-full items-center'> Free</span>
+            </button>
+          </div>
+        </div>
+
         {
           rentListings && rentListings.length > 0 && (
             <div>
