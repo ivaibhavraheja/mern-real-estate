@@ -11,6 +11,7 @@ import UpdateListing from './pages/UpdateListing'
 import Listing from './pages/Listing'
 import Search from './pages/Search'
 import Error from './pages/Error'
+import Bookmarks from './pages/Bookmarks'
 
 export default function App() {
   return <BrowserRouter>
@@ -22,6 +23,7 @@ export default function App() {
     <Route path="/about" element={<About/>}/>
     <Route element={<PrivateRoute/>}>
       <Route path="/profile" element={<Profile/>}/>
+      <Route path="/bookmarks" element={<Bookmarks/>}/>
       <Route path="/create-listing" element={<CreateListing/>}/>
       <Route path="/update-listing/:listingId" element={<UpdateListing/>}/>
     </Route>

@@ -17,6 +17,9 @@ export default function Listing() {
     const [error, setError] = useState(false);
     const [copied, setCopied] = useState(false);
     const [contact, setContact] = useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    const [userBookmarks, setUserBookmarks] = useState(null);
+    
     // console.log(currentUser._id);
     // console.log(listing?.userRef);
 
@@ -26,6 +29,47 @@ export default function Listing() {
         setTimeout(() => {
             setCopied(false);
         }, 2000);
+    }
+
+    const handleBookmark = async() => {
+        setLoading(true);
+        try{
+            if(isBookmarked){
+                //remove bookmark
+                const res = await fetch(`/api/bookmark/remove`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: currentUser._id,
+                        listingId: params.listingId,
+                    }),
+                })
+                const data = await res.json();
+                setIsBookmarked(false);
+            }
+            else{
+                //add bookmark
+                const res = await fetch(`/api/bookmark/add`, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: currentUser._id,
+                        listingId: params.listingId,
+                    }),
+                })
+                const data = await res.json();
+                setIsBookmarked(true);
+            }
+            setLoading(false);
+        }
+        catch(error){
+            console.error(error);
+            setLoading(false);
+        }
     }
 
     //since useEffect is sync so if we need to use async function in it, we need to create and call it separatly in it, not write down function directly
@@ -53,8 +97,41 @@ export default function Listing() {
     }, [params.listingId]);
     // render each time the listinId in params changes
 
+    useEffect(() => {
+        const fetchUserBookmarks = async() => {
+            setLoading(true);
+            try{
+                // console.log("hitting getuserbookmarks api")
+                const userId = currentUser._id;
+                const res = await fetch(`/api/bookmark/user?userId=${userId}`);
+                const data = await res.json();
+                // console.log("user bookmarks --> ", data);
+                setUserBookmarks(data?.bookmarks);
+                // console.log(userBookmarks);
+            }
+            catch(error){
+                console.log("COULD NOT FETCH USER BOOKMARKS");
+                console.log(error);
+            }
+            setLoading(false);
+        }
+        fetchUserBookmarks();
+    }, [])
+
+    useEffect(() => {
+        // Check if the current listing is in the user's bookmarks
+        if (Array.isArray(userBookmarks) && userBookmarks.length > 0) {
+            for (let i = 0; i < userBookmarks.length; i++) {
+                if (userBookmarks[i]._id === params.listingId) {
+                    setIsBookmarked(true);
+                    break;
+                }
+            }
+        }
+    }, [params.listingId, userBookmarks])
+
     return (
-        <main>
+        <main className='-z-50'>
             {
                 // replace with spinner
                 loading && <p className='text-center my-7 text-2xl'>Loading...</p>
@@ -66,7 +143,7 @@ export default function Listing() {
             {
                 listing && !loading && !error && (
                     <div>
-                        <Swiper navigation>
+                        <Swiper navigation className='-z-10'>
                             {
                                 listing.imageUrls.map((url) => (
                                     <SwiperSlide key={url}>
@@ -76,7 +153,7 @@ export default function Listing() {
                                 ))
                             }
                         </Swiper>
-                        <div className='fixed top-[13%] right-[13%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
+                        <div className='fixed top-[13%] right-[16%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer'>
                             <FaShare className='text-slate-500' onClick={() => handleCopy()}/>
                         </div>
                         {
@@ -86,14 +163,19 @@ export default function Listing() {
                         }
                         
                         <div className='flex flex-col max-w-5xl mx-auto p-3 my-7 gap-4'>
-                            <p className='text-3xl font-bold italic font-sans uppercase'>
-                                {listing.name} - ₹{''}
-                                {listing.offer
-                                    ? listing.discountPrice.toLocaleString('en-in')
-                                    : listing.regularPrice.toLocaleString('en-in')
-                                }
-                                {listing.type === 'rent' && ' /month'}
-                            </p>
+                            <div className='flex justify-between items-center'>
+                                <p className='text-3xl font-bold italic font-sans uppercase'>
+                                    {listing.name} - ₹{''}
+                                    {listing.offer
+                                        ? listing.discountPrice.toLocaleString('en-in')
+                                        : listing.regularPrice.toLocaleString('en-in')
+                                    }
+                                    {listing.type === 'rent' && ' /month'}
+                                </p>
+                                <button onClick={handleBookmark} className='text-blue-500 hover:text-blue-900'>
+                                    {isBookmarked ? 'Remove Bookmark' : 'Add Bookmark'}
+                                </button>
+                            </div>
                             <p className='flex items-center mt-6 gap-2 text-slate-600 text-sm'>
                                 <FaMapMarkedAlt className='text-green-700'/>
                                 {listing.address}

@@ -18,7 +18,7 @@ export default function Home() {
 
   SwiperCore.use([Navigation]);
 
-  console.log(offerListings);
+  // console.log(offerListings);
 
   useEffect(() => {
     // we need to render it only one time when page launches --> []
