@@ -1,16 +1,20 @@
 import {FaSearch} from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from "react";
 import {logo} from "../assets/index"
 import { CgProfile } from "react-icons/cg";
 import { IoBookmarks } from "react-icons/io5";
+import { IoIosLogOut } from "react-icons/io";
+import { deleteUserFailure, signOutStart, signOutFailure, signOutSuccess} from "../redux/user/userSlice";
+
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const [optionVisible, setOptionVisible] = useState(false);
+  const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -27,6 +31,22 @@ export default function Header() {
       setOptionVisible(true);
   }
 
+  const handleLogOut = async() => {
+    setOptionVisible(false);
+    try{
+      dispatch(signOutStart());
+      const res = await fetch('/api/auth/signout');
+      const data = await res.json();
+      if(data.success === false){
+        dispatch(signOutFailure(data.message));
+        return;
+      }
+      dispatch(signOutSuccess(data));
+    }
+    catch(error){
+      dispatch(deleteUserFailure(error.message));
+    }
+  }
   // use useEffect hook to render the searchTerm in searchBar of header if it has been changed in search bar of the browser directly
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -36,6 +56,9 @@ export default function Header() {
     }
   }, [location.search]);
 
+  useEffect(() => {
+    console.log(currentUser);
+  }, [currentUser])
   return (
     <header className='bg-slate-200 shadow-md relative'>
       <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
@@ -72,23 +95,26 @@ export default function Header() {
             {currentUser ? (
               <img className="rounded-full h-7 w-7 object-cover" src={currentUser.avatar} alt="profile"/>
             ) : (
-              <li className="text-slate-700 hover:underline">Sign In</li>
+              <Link to={'/sign-in'} className="text-slate-700 hover:underline">Sign In</Link>
             )}
           </button>
         </ul>
       </div>
             {
-              optionVisible ? (
+              currentUser && optionVisible ? (
                 <div className="z-10">
-                  <div className="absolute bg-slate-300 w-6 h-6 rotate-45 right-3 top-14 translate-y-4 2xl:right-52 2xl:translate-x-4"></div>
-                  <div className="absolute top-16 translate-y-4 right-2 2xl:right-24 bg-slate-300 flex flex-col rounded-m p-1">
+                  <div className="absolute top-14 translate-y-4 right-1 2xl:right-24 bg-slate-300 flex flex-col rounded-lg p-1">
                     <Link to={'/profile'} className="flex items-center gap-2 border-b-2 p-2" onClick={() => setOptionVisible(false)}>
                       <CgProfile/>
                       <p>Profile</p>  
                     </Link>
-                    <Link to={'/bookmarks'} className="flex items-center gap-2 p-2" onClick={() => setOptionVisible(false)}>
+                    <Link to={'/bookmarks'} className="flex items-center gap-2 border-b-2 p-2" onClick={() => setOptionVisible(false)}>
                       <IoBookmarks/>
                       <p>Bookmarks</p>
+                    </Link>
+                    <Link to={'/'} className="flex items-center gap-2 border-b-2 p-2" onClick={handleLogOut}>
+                      <IoIosLogOut/>
+                      <p>Log Out</p>
                     </Link>
                   </div>
                 </div>
